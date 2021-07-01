@@ -4,6 +4,7 @@ use multipart::client::lazy::Multipart;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::PathBuf;
+use std::fmt::Display;
 
 static BASE_API_URL: &str = "https://api.telegram.org/bot";
 
@@ -69,6 +70,17 @@ impl From<ureq::Error> for Error {
 
                 Error::HttpError(error)
             }
+        }
+    }
+}
+
+impl std::error::Error for Error {}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::HttpError(e) => write!(f, "http error code {} message {}", e.code, e.message),
+            Error::ApiError(e) => write!(f, "api error ok {} code {} description {}", e.ok, e.error_code, e.description),
         }
     }
 }
